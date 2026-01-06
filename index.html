@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Visualizer Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-6">
+
+    <div class="text-center mb-16">
+        <h1 class="text-5xl font-extrabold text-gray-800 mb-4 tracking-tight">
+            Algorithm <span class="text-blue-600">Visualizers</span>
+        </h1>
+        <p class="text-gray-600 text-lg">Select a module to begin the interactive demonstration.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">
+        
+        <div onclick="navigateTo('avl.html')" class="glass-card cursor-pointer p-8 rounded-3xl flex flex-col items-center text-center group">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-tree text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">AVL Tree</h2>
+            <p class="text-gray-500 mb-6">Explore self-balancing binary search trees and rotation logic.</p>
+            <span class="text-blue-600 font-semibold flex items-center gap-2">
+                Launch Explorer <i class="fa-solid fa-arrow-right text-sm"></i>
+            </span>
+        </div>
+
+        <div onclick="navigateTo('lru.html')" class="glass-card cursor-pointer p-8 rounded-3xl flex flex-col items-center text-center group">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-memory text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">LRU Cache</h2>
+            <p class="text-gray-500 mb-6">Visualize paging algorithms and the Least Recently Used eviction policy.</p>
+            <span class="text-purple-600 font-semibold flex items-center gap-2">
+                Launch Explorer <i class="fa-solid fa-arrow-right text-sm"></i>
+            </span>
+        </div>
+
+        <div onclick="navigateTo('sort.html')" class="glass-card cursor-pointer p-8 rounded-3xl flex flex-col items-center text-center group">
+            <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-chart-simple text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Sorting</h2>
+            <p class="text-gray-500 mb-6">Compare time complexities of Bubble, Merge, and Quick Sort.</p>
+            <span class="text-orange-600 font-semibold flex items-center gap-2">
+                Launch Explorer <i class="fa-solid fa-arrow-right text-sm"></i>
+            </span>
+        </div>
+
+    </div>
+
+    <footer class="mt-20 text-gray-500 text-sm">
+        Click on any card to navigate to the respective visualizer.
+    </footer>
+
+    <script>
+        function navigateTo(page) {
+            // Adding a small delay for the click ripple effect feel
+            const body = document.body;
+            body.style.opacity = "0.5";
+            body.style.transition = "opacity 0.2s ease";
+            
+            setTimeout(() => {
+                window.location.href = page;
+            }, 150);
+        }
+    </script>
+</body>
+</html>
