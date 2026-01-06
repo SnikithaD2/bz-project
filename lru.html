@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LRU Cache Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .cache-item { transition: all 0.3s ease; }
+        .mru { border-color: #3b82f6; background-color: #eff6ff; }
+        .lru { border-color: #ef4444; background-color: #fef2f2; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center py-12 px-4">
+
+    <h1 class="text-4xl font-bold text-gray-800 mb-8">LRU Cache Visualizer</h1>
+
+    <div class="bg-white p-6 rounded-xl shadow-md flex flex-wrap gap-4 items-end mb-10 border border-gray-200">
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Cache Capacity</label>
+            <input type="number" id="capacityInput" value="4" min="1" 
+                class="w-32 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Enter Process/Value</label>
+            <input type="text" id="processInput" placeholder="e.g. A" 
+                class="w-48 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <button onclick="addToCache()" 
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md transition duration-200">
+            Add Process
+        </button>
+        <button onclick="resetCache()" 
+            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded-md transition duration-200">
+            Reset
+        </button>
+    </div>
+
+    <div id="status" class="mb-4 h-6 font-medium text-blue-600"></div>
+
+    <div class="w-full max-w-4xl text-center">
+        <h2 class="text-2xl font-semibold text-gray-700 mb-6">Cache State (MRU &rarr; LRU)</h2>
+        
+        <div id="cacheContainer" class="flex flex-row-reverse justify-center gap-4 min-h-[120px]">
+            <p class="text-gray-400 italic">Cache is currently empty.</p>
+        </div>
+
+        <div class="mt-8 flex justify-center gap-8 text-sm">
+            <div class="flex items-center gap-2">
+                <span class="w-4 h-4 bg-blue-100 border-2 border-blue-500 rounded"></span>
+                <span>Most Recently Used (MRU)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-4 h-4 bg-red-50 border-2 border-red-500 rounded"></span>
+                <span>Least Recently Used (LRU)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cache = new Map();
+        let capacity = 4;
+
+        function updateUI(lastAction = "") {
+            const container = document.getElementById('cacheContainer');
+            const status = document.getElementById('status');
+            container.innerHTML = '';
+            status.innerText = lastAction;
+
+            const keys = Array.from(cache.keys()).reverse(); // MRU to LRU
+
+            if (keys.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 italic">Cache is currently empty.</p>';
+                return;
+            }
+
+            keys.forEach((key, index) => {
+                const div = document.createElement('div');
+                div.className = `cache-item w-24 h-24 flex flex-col items-center justify-center border-4 rounded-xl shadow-sm text-xl font-bold
+                    ${index === 0 ? 'mru scale-110 z-10' : 'bg-white border-gray-200'}
+                    ${index === keys.length - 1 && keys.length == capacity ? 'lru' : ''}`;
+                
+                div.innerHTML = `
+                    <span class="text-gray-800">${key}</span>
+                    <span class="text-[10px] uppercase mt-1 text-gray-400">
+                        ${index === 0 ? 'MRU' : index === keys.length - 1 ? 'LRU' : `Pos ${index}`}
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addToCache() {
+            const valInput = document.getElementById('processInput');
+            const capInput = document.getElementById('capacityInput');
+            const val = valInput.value.trim();
+            capacity = parseInt(capInput.value) || 4;
+
+            if (!val) return;
+
+            let actionText = "";
+
+            if (cache.has(val)) {
+                // Hit: Move to front
+                cache.delete(val);
+                cache.set(val, true);
+                actionText = `Cache Hit: ${val} moved to MRU.`;
+            } else {
+                // Miss: Add new
+                if (cache.size >= capacity) {
+                    const lruKey = cache.keys().next().value;
+                    cache.delete(lruKey);
+                    actionText = `Cache Miss: Evicted ${lruKey}, added ${val}.`;
+                } else {
+                    actionText = `Cache Miss: Added ${val}.`;
+                }
+                cache.set(val, true);
+            }
+
+            valInput.value = '';
+            valInput.focus();
+            updateUI(actionText);
+        }
+
+        function resetCache() {
+            cache.clear();
+            updateUI("Cache cleared.");
+        }
+
+        // Allow "Enter" key to add process
+        document.getElementById('processInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addToCache();
+        });
+    </script>
+</body>
+</html>
