@@ -3,87 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Algorithm Visualizer</title>
+    <title>Sorting Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* height: 100vh; */
-            margin: 0;
-        }
-
-        .main-container {
-            text-align: center;
-            width: 90%;
-        }
-
-        .controls {
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        select, input, button {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            font-size: 14px;
-        }
-
-        button {
-            background-color: #3b82f6;
-            color: white;
-            cursor: pointer;
-            border: none;
-            font-weight: 600;
-        }
-
-        #visualizer {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            min-height: 100px;
-        }
-
-        .bubble {
-            width: 55px;
-            height: 55px;
-            border: 2px solid #1e293b;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: white;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-
-        .active { border-color: #ef4444; background-color: #fee2e2; transform: scale(1.1); }
-        .sorted { border-color: #10b981; background-color: #d1fae5; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .bubble-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .active-sort { border-color: #f97316; background-color: #fff7ed; transform: translateY(-10px) scale(1.1); box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3); }
+        .sorted-item { border-color: #10b981; background-color: #f0fdf4; color: #059669; }
     </style>
 </head>
-<body>
-    <div class="main-container">
-        <h1>Sorting Visualizer</h1>
-        
-        <div class="controls">
-            <select id="algoSelect">
-                <option value="bubble">Bubble Sort</option>
-                <option value="selection">Selection Sort</option>
-                <option value="insertion">Insertion Sort</option>
-            </select>
-            <input type="text" id="inputValues" placeholder="e.g. 15, 8, 22, 4">
-            <button onclick="handleSort()">Start Sorting</button>
+<body class="p-8">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="flex items-center justify-between mb-8">
+            <a href="index.html" class="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors font-semibold">
+                <i class="fa-solid fa-arrow-left"></i> Back to Home
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800">Sorting <span class="text-orange-600">Visualizer</span></h1>
+            <div class="w-24"></div>
         </div>
 
-        <h3 id="statusText">Array State (MRU → LRU style)</h3>
-        <div id="visualizer"></div>
+        <div class="glass-panel p-8 shadow-xl">
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <select id="algoSelect" class="p-3 bg-white border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 font-semibold text-gray-600">
+                    <option value="bubble">Bubble Sort</option>
+                    <option value="selection">Selection Sort</option>
+                    <option value="insertion">Insertion Sort</option>
+                </select>
+                <input type="text" id="inputValues" placeholder="e.g. 15, 8, 22, 4" class="p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 w-64">
+                <button onclick="handleSort()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg shadow-orange-200">
+                    Start Sorting
+                </button>
+            </div>
+
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-8">Array Animation</h3>
+            <div id="visualizer" class="flex justify-center flex-wrap gap-4 min-h-[100px]">
+                <p class="text-gray-400 italic">Enter numbers to begin visualization.</p>
+            </div>
+        </div>
     </div>
+
     <script>
         const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
@@ -91,14 +51,11 @@
             const input = document.getElementById('inputValues').value;
             const algo = document.getElementById('algoSelect').value;
             if (!input) return;
-
             let arr = input.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
             render(arr);
-
             if (algo === 'bubble') await bubbleSort(arr);
             else if (algo === 'selection') await selectionSort(arr);
             else if (algo === 'insertion') await insertionSort(arr);
-            // Note: Quick/Merge/Heap require more complex state management for visualization
         }
 
         function render(arr, actives = [], sorted = []) {
@@ -106,20 +63,19 @@
             container.innerHTML = '';
             arr.forEach((val, i) => {
                 const div = document.createElement('div');
-                div.className = 'bubble';
-                if (actives.includes(i)) div.classList.add('active');
-                if (sorted.includes(i)) div.classList.add('sorted');
+                div.className = `bubble-item w-16 h-16 flex items-center justify-center border-4 rounded-2xl bg-white text-xl font-bold shadow-sm
+                    ${actives.includes(i) ? 'active-sort' : 'border-gray-100 text-gray-700'}
+                    ${sorted.includes(i) ? 'sorted-item' : ''}`;
                 div.innerText = val;
                 container.appendChild(div);
             });
         }
 
-        // Example: Selection Sort Implementation
         async function selectionSort(arr) {
             for (let i = 0; i < arr.length; i++) {
                 let minIdx = i;
                 for (let j = i + 1; j < arr.length; j++) {
-                    render(arr, [i, j]);
+                    render(arr, [i, j], [...Array(i).keys()]);
                     await sleep(400);
                     if (arr[j] < arr[minIdx]) minIdx = j;
                 }
@@ -128,11 +84,10 @@
             }
         }
 
-        // Example: Bubble Sort Implementation
         async function bubbleSort(arr) {
             for (let i = 0; i < arr.length; i++) {
                 for (let j = 0; j < arr.length - i - 1; j++) {
-                    render(arr, [j, j + 1]);
+                    render(arr, [j, j + 1], [...Array(i).keys()].map(x => arr.length - 1 - x));
                     await sleep(300);
                     if (arr[j] > arr[j + 1]) {
                         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
@@ -143,16 +98,13 @@
             render(arr, [], [...Array(arr.length).keys()]);
         }
 
-        // Example: Insertion Sort Implementation
         async function insertionSort(arr) {
             for (let i = 1; i < arr.length; i++) {
-                let key = arr[i];
-                let j = i - 1;
+                let key = arr[i]; let j = i - 1;
                 while (j >= 0 && arr[j] > key) {
                     render(arr, [j, j + 1]);
                     await sleep(400);
-                    arr[j + 1] = arr[j];
-                    j = j - 1;
+                    arr[j + 1] = arr[j]; j = j - 1;
                 }
                 arr[j + 1] = key;
                 render(arr, [j + 1]);
